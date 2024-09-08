@@ -6,14 +6,16 @@ import java.util.Scanner;
 class BankAccount {
     private String accountNumber;
     private double balance;
+    private String pin;
 
     // Constructor
-    public BankAccount(String accountNumber, double initialBalance) {
+    public BankAccount(String accountNumber, double initialBalance, String pin) {
         this.accountNumber = accountNumber;
         this.balance = initialBalance;
+        this.pin = pin;
     }
 
-    // Method to deposit the money:
+    // Method to deposit money:
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
@@ -24,8 +26,13 @@ class BankAccount {
         }
     }
 
-    // Method to Withdraw Money:
-    public void withdraw(double amount) {
+    // Method to withdraw money with PIN validation:
+    public void withdraw(double amount, String enteredPin) {
+        if (!enteredPin.equals(pin)) {
+            System.out.println("Incorrect PIN. Withdrawal denied.");
+            return;
+        }
+
         if (amount <= 0) {
             System.out.println("Withdrawal amount must be positive.");
         } else if (amount > balance) {
@@ -42,12 +49,12 @@ class BankAccount {
         return balance;
     }
 
-    // Method for an Account Number:
+    // Method for getting the account number:
     public String getAccountNumber() {
         return accountNumber;
     }
 
-    // This is for displaying the current date and time after withdrawing and depositing money:
+    // This is for displaying the current date and time after transactions:
     private void showTransactionTime() {
         LocalDateTime currentTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -61,16 +68,26 @@ class Customer {
     private String customerId;
     private ArrayList<BankAccount> accounts;
 
-    // Constructor
+    // Constructor:
     public Customer(String name, String customerId) {
         this.name = name;
         this.customerId = customerId;
         this.accounts = new ArrayList<>();
     }
 
-    // Creating a new bank account
-    public void createAccount(String accountNumber, double initialBalance) {
-        BankAccount newAccount = new BankAccount(accountNumber, initialBalance);
+
+    public void createAccount(String accountNumber, double initialBalance, String pin) {
+        if (accountNumber.length() != 6) { // Validate 6-digit account number
+            System.out.println("Error: Account number must be exactly 6 digits.");
+            return;
+        }
+
+        if (pin.length() != 4) {
+            System.out.println("Error: PIN must be exactly 4 digits.");
+            return;
+        }
+
+        BankAccount newAccount = new BankAccount(accountNumber, initialBalance, pin);
         accounts.add(newAccount);
         System.out.println("Congratulations, " + name + "! You have created an account with account number: " + accountNumber);
     }
@@ -82,7 +99,7 @@ class Customer {
                 return account;
             }
         }
-        System.out.println("Account not found.");
+        System.out.println("Account  Number  not found.");
         return null;
     }
 
@@ -97,28 +114,31 @@ class Customer {
     }
 }
 
-public class BankAccountApp{
+public class BankAccountApp {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // method to Create a new account:
-        System.out.println("To create an Account you have to enter your names, customer ID, account number, and initial balance.");
-        System.out.println("Enter your Fullname: ");
+        // Creating a new account:
+        System.out.println("To create an account, you have to enter your name, customer ID, account number, initial balance, and PIN.");
+        System.out.print("Enter your Full Name: ");
         String customerName = scanner.nextLine();
 
-        System.out.println("Enter your customer ID: ");
+        System.out.print("Enter your customer ID: ");
         String customerId = scanner.nextLine();
 
         Customer customer = new Customer(customerName, customerId);
 
-        // Create bank accounts:
-        System.out.println("Enter an account number to create: ");
+        // Create a bank account:
+        System.out.print("Enter an account number (6 digits): "); // Prompt for 6 digits
         String accountNumber = scanner.nextLine();
 
-        System.out.println("Enter initial balance: ");
+        System.out.print("Enter a 4-digit PIN: ");
+        String pin = scanner.nextLine();
+
+        System.out.print("Enter initial balance: ");
         double initialBalance = scanner.nextDouble();
 
-        customer.createAccount(accountNumber, initialBalance);
+        customer.createAccount(accountNumber, initialBalance, pin);
 
         // Main menu loop:
         boolean exit = false;
@@ -139,14 +159,18 @@ public class BankAccountApp{
 
             switch (choice) {
                 case 1:
-                    System.out.println("Enter deposit amount: ");
+                    System.out.print("Enter deposit amount: ");
                     double depositAmount = scanner.nextDouble();
                     account.deposit(depositAmount);
                     break;
                 case 2:
-                    System.out.println("Enter withdrawal amount: ");
+                    System.out.print("Enter withdrawal amount: ");
                     double withdrawalAmount = scanner.nextDouble();
-                    account.withdraw(withdrawalAmount);
+
+                    System.out.print("Enter your 4-digit PIN: ");
+                    String enteredPin = scanner.next();
+
+                    account.withdraw(withdrawalAmount, enteredPin);
                     break;
                 case 3:
                     System.out.println("Your balance is: " + account.checkBalance());
