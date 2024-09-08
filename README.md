@@ -14,7 +14,7 @@ The Bank Account Application is a simple Java console application that allows us
 ### Usage
 
 1. **Create an Account**:
-   - Enter your full name, customer ID, account number, and initial balance when prompted.
+   - Enter your full name, customer ID, account number, and initial balance when prompted,Pin.
 
 2. **Main Menu Options**:
    - **Deposit Money**: Enter the amount to deposit.
